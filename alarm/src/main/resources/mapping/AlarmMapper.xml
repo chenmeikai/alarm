@@ -7,7 +7,7 @@
 		<result column="grade" property="grade" jdbcType="INTEGER" />
 		<result column="event" property="event" jdbcType="VARCHAR" />
 		<result column="detail" property="detail" jdbcType="VARCHAR" />
-		<result column="create_time" property="createTime" jdbcType="DATE" />
+		<result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
 		<result column="use_time" property="useTime" jdbcType="DOUBLE" />
 	</resultMap>
 
@@ -37,10 +37,24 @@
 		)
 	</sql>
 
-	<insert id="save" keyProperty="id" useGeneratedKeys="true" parameterType="com.inesv.alarm.model.Alarm">
+	<insert id="save" keyProperty="id" useGeneratedKeys="true"
+		parameterType="com.inesv.alarm.model.Alarm">
 		<include refid="sql_save_columns" />
 		<include refid="sql_save_values" />
 	</insert>
+
+
+	<select id="getByEventLastTime" resultMap="BaseResultMap"
+		parameterType="String">
+		select
+		create_time
+		from t_alarm
+		WHERE 1=1
+		<if test="_parameter != null">
+			AND event=#{_parameter,jdbcType=VARCHAR}
+		</if>
+		order by id desc limit 1
+	</select>
 
 
 

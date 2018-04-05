@@ -14,5 +14,8 @@ import com.inesv.alarm.model.Alarm;
 public interface AlarmMapper {
 	
 	public int save(Alarm alarm);
+	
+	//获取接口的最后一次告警记录
+	public Alarm getByEventLastTime(String event);
 
 }

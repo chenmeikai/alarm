@@ -12,11 +12,10 @@ public class AnotationServiceImpl implements AnotationService {
 	
 	@Override
 	@AlarmLog(alarmTime=3,isEmail=true)
-	public void test(String name,int age) throws Exception {
+	public void test(String name,int age) {
 		String wrong=null;
-//		wrong.equals("asdf");
+		wrong.equals("asdf");
 		System.out.println("hello world");
-		throw new Exception("haha");
 	}
 
 }

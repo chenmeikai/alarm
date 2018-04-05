@@ -12,6 +12,6 @@ package com.inesv.service;
  */
 public interface AnotationService {
 	
-	public void test(String name,int age)throws Exception;
+	public void test(String name,int age);
 
 }
