@@ -7,7 +7,6 @@ package com.inesv.alarm.anotation;
 
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
-
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.AfterThrowing;
@@ -18,14 +17,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import com.inesv.alarm.mapper.AlarmMapper;
 import com.inesv.alarm.model.Alarm;
-import com.inesv.alarm.utils.MyTaskUtil;
 import com.inesv.alarm.utils.PropertiesUtil;
 import com.inesv.alarm.utils.SendEmail;
 import com.inesv.alarm.utils.StringUtils;
-import com.inesv.alarm.utils.ThreadUtil;
+import com.inesv.alarm.utils.ThreadUtils;
 
 /**
- * @Description:警告注解
+ * @Description:告警注解
  * @author: cmk
  * @date: 2018年4月3日 上午8:56:01
  */
@@ -52,8 +50,7 @@ public class AlarmAspect {
 	 * @return
 	 * @throws Throwable
 	 */
-	@SuppressWarnings("rawtypes")
-	@Around(value = "(execution(* com.*.*..*(..))) && @annotation(alarmLog)")
+	@Around(value = "(execution(* *.*.*..*(..))) && @annotation(alarmLog)")
 	public Object around(ProceedingJoinPoint joinPoint, AlarmLog alarmLog) throws Throwable {
 
 		long alarmTime = alarmLog.alarmTime();
@@ -100,16 +97,16 @@ public class AlarmAspect {
 			// 发送邮件
 			if (isEmail == true) {
 				// 查询上一次该接口发生告警的时间，判断是否已过冷却时间(30分钟)，是则发送短信
-				Alarm lastAlarm = alarmMapper.getByEventLastTime(className + "." + method);
+				Date date = alarmMapper.getByEventLastTime(className + "." + method);
 				Long coolTime = 30 * 60 * 1000L;
-				if (lastAlarm != null) {
-					Date lastDate =lastAlarm.getCreateTime();
+				if (date != null) {
+					Date lastDate =date;
 					coolTime = startDate.getTime() - lastDate.getTime();
 				}
 				if (coolTime >= 30 * 60 * 1000L) {
 					// 异步发送邮件
 					try {
-						ThreadUtil.execute(new MyTaskUtil() {
+						ThreadUtils.execute(new Runnable() {
 							@Override
 							public void run() {
 								try {
@@ -150,8 +147,7 @@ public class AlarmAspect {
 	 * @param myLog
 	 * @param ex
 	 */
-	@SuppressWarnings("rawtypes")
-	@AfterThrowing(value = "(execution(* com.*.*..*(..))) && @annotation(alarmLog)", throwing = "ex")
+	@AfterThrowing(value = "(execution(* *.*.*..*(..))) && @annotation(alarmLog)", throwing = "ex")
 	public void afterThrowing(JoinPoint joinPoint, AlarmLog alarmLog, Exception ex) {
 
 		boolean isEmail = alarmLog.isEmail();
@@ -181,16 +177,16 @@ public class AlarmAspect {
 		// 发送邮件
 		if (isEmail == true) {
 			// 查询上一次该接口发生告警的时间，判断是否已过冷却时间(30分钟)，是则发送短信
-			Alarm lastAlarm = alarmMapper.getByEventLastTime(className + "." + method);
+			Date date = alarmMapper.getByEventLastTime(className + "." + method);
 			Long coolTime = 30 * 60 * 1000L;
-			if (lastAlarm != null) {
-				Date lastDate =lastAlarm.getCreateTime();
+			if (date != null) {
+				Date lastDate =date;
 				coolTime = startDate.getTime() - lastDate.getTime();
 			}
 			if (coolTime >= 30 * 60 * 1000L) {
 				// 异步发送短信
 				try {
-					ThreadUtil.execute(new MyTaskUtil() {
+					ThreadUtils.execute(new Runnable() {
 						@Override
 						public void run() {
 							try {

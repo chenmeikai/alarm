@@ -1,0 +1,24 @@
+监控模块（打包成jar）引入到其他项目
+
+注意事项：
+1、该模块只适用于spring+mybatis框架；
+2、引入该模块的项目须开启注解功能；
+3、引入该模块的项目须添加mail依赖；
+4、数据库须有t_alarm表；
+5、spring须扫描到 com.inesv.alarm.mapper路径；
+6、Mybatis须扫描到 com.inesv.alarm.mapper路径；
+7、alarm.properties须放在resources路径下，该文件中配置了发送邮件双方的信息
+
+
+注解说明：
+@AlarmLog(alarmTime=3,isEmail=true)
+1、属性介绍： 
+  alarmTime，超时时间，单位为妙，如果接口耗时超过该值，则会添加记录，并发送告警邮件；
+  isEmail，true表示触发即发送邮件，不填或者填写其它则不会发送邮件
+
+2、触发条件：
+     超时告警和异常告警
+     
+
+jar包生成命令：
+mvn assembly:assembly -Dmaven.test.skip=true     
